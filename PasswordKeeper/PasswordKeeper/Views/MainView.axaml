@@ -1,16 +1,55 @@
 <UserControl xmlns="https://github.com/avaloniaui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="using:PasswordKeeper.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="PasswordKeeper.Views.MainView"
-             x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+			 xmlns:controls="using:Material.Styles.Controls"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PasswordKeeper.ViewModels"
+			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="PasswordKeeper.Views.MainView"
+			 x:DataType="vm:MainViewModel">
+	<Design.DataContext>
+		<!-- This only sets the DataContext for the previewer in an IDE,
+		to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+		<vm:MainViewModel />
+	</Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+	<Grid Background="{DynamicResource SystemRegionColor}">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
+			<RowDefinition Height="*"/>
+		</Grid.RowDefinitions>
+
+		<Border Grid.Row="0"
+				Height="60">
+			<Border.Background>
+				<SolidColorBrush Color="{DynamicResource SystemChromeHighColor}" Opacity="0.75"/>
+			</Border.Background>
+
+			<Grid Margin="10 0">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="Auto"/> 
+					<ColumnDefinition Width="*"/>
+				</Grid.ColumnDefinitions>
+
+				<controls:FloatingButton Grid.Column="0"
+										 HorizontalAlignment="Left" VerticalAlignment="Center"
+										 Classes="Mini"
+										 Command="{Binding ToggleThemeCommand}">
+					<materialIcons:MaterialIcon Width="25" Height="25"
+												Foreground="Black"
+												Kind="{Binding IsDarkTheme, Converter={StaticResource ThemeToIconConverter}}"/>
+				</controls:FloatingButton>
+
+			</Grid>
+		</Border>
+
+		<ScrollViewer Grid.Row="1"
+					  HorizontalScrollBarVisibility="Disabled"
+					  VerticalScrollBarVisibility="Auto">
+			<Grid Margin="20">
+
+			</Grid>
+		</ScrollViewer>
+	</Grid>
 </UserControl>
