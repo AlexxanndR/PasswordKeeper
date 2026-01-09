@@ -1,6 +1,8 @@
 <Application xmlns="https://github.com/avaloniaui"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:local="using:PasswordKeeper"
+			 xmlns:themes="clr-namespace:Material.Styles.Themes;assembly=Material.Styles"
+			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
 			 x:Class="PasswordKeeper.App"
 			 RequestedThemeVariant="Default">
 	<!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
@@ -10,11 +12,13 @@
 	</Application.DataTemplates>
 
 	<Application.Styles>
+		<materialIcons:MaterialIconStyles />
 		<FluentTheme>
 			<FluentTheme.Palettes>
 				<ColorPaletteResources x:Key="Light" Accent="#ffae8eff" AltHigh="White" AltLow="White" AltMedium="White" AltMediumHigh="White" AltMediumLow="White" BaseHigh="Black" BaseLow="#ffcfbcff" BaseMedium="#ff8c7abe" BaseMediumHigh="#ff5f4e93" BaseMediumLow="#ff7564a9" ChromeAltLow="#ff5f4e93" ChromeBlackHigh="Black" ChromeBlackLow="#ffcfbcff" ChromeBlackMedium="#ff5f4e93" ChromeBlackMediumLow="#ff8c7abe" ChromeDisabledHigh="#ffcfbcff" ChromeDisabledLow="#ff8c7abe" ChromeGray="#ff7564a9" ChromeHigh="#ffcfbcff" ChromeLow="#ffeee4ff" ChromeMedium="#ffe8dcff" ChromeMediumLow="#ffeee4ff" ChromeWhite="White" ListLow="#ffe8dcff" ListMedium="#ffcfbcff" RegionColor="#fff2edff" />
 				<ColorPaletteResources x:Key="Dark" Accent="#ff8d5fff" AltHigh="Black" AltLow="Black" AltMedium="Black" AltMediumHigh="Black" AltMediumLow="Black" BaseHigh="White" BaseLow="#ff6b31b7" BaseMedium="#ffb797e2" BaseMediumHigh="#ffcab1ed" BaseMediumLow="#ff9164cd" ChromeAltLow="#ffcab1ed" ChromeBlackHigh="Black" ChromeBlackLow="#ffcab1ed" ChromeBlackMedium="Black" ChromeBlackMediumLow="Black" ChromeDisabledHigh="#ff6b31b7" ChromeDisabledLow="#ffb797e2" ChromeGray="#ffa47ed7" ChromeHigh="#ffa47ed7" ChromeLow="#ff2f0c76" ChromeMedium="#ff3e1586" ChromeMediumLow="#ff5c28a7" ChromeWhite="White" ListLow="#ff3e1586" ListMedium="#ff6b31b7" RegionColor="#ff07001a" />
 			</FluentTheme.Palettes>
 		</FluentTheme>
+		<themes:MaterialTheme BaseTheme="Inherit" />
 	</Application.Styles>
 </Application>
