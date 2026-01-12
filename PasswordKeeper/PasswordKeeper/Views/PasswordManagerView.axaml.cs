@@ -1,6 +1,6 @@
 using Avalonia.Controls;
 
-namespace PasswordKeeper;
+namespace PasswordKeeper.Views;
 
 public partial class PasswordManagerView : UserControl
 {
