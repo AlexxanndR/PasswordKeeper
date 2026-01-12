@@ -28,7 +28,7 @@
 
 			<Grid Margin="10 0">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto"/> 
+					<ColumnDefinition Width="Auto"/>
 					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
 
@@ -47,8 +47,17 @@
 		<ScrollViewer Grid.Row="1"
 					  HorizontalScrollBarVisibility="Disabled"
 					  VerticalScrollBarVisibility="Auto">
-			<Grid Margin="20">
-
+			<Grid>
+				<ContentControl Content="{Binding CurrentView}" />
+				<controls:FloatingButton Margin="15 10"
+										 HorizontalAlignment="Right" VerticalAlignment="Bottom"
+										 Classes="Mini"
+										 Background="{DynamicResource SystemAccentColor}" 
+										 Command="{Binding AddPasswordCommand}">
+					<materialIcons:MaterialIcon Width="25" Height="25"
+												Foreground="Black"
+												Kind="Plus"/>
+				</controls:FloatingButton>
 			</Grid>
 		</ScrollViewer>
 	</Grid>
