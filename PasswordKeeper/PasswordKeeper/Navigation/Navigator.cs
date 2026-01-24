@@ -32,9 +32,9 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
     public void NavigateTo<TViewModel>() where TViewModel : class
         => Navigate(_serviceProvider.GetRequiredService<TViewModel>());
 
-    public void NavigateTo<TViewModel, TParam>(params TParam[] parameter) where TViewModel : class
+    public void NavigateTo<TViewModel, TParam>(params TParam[] parameters) where TViewModel : class
     {
-        var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider, parameter);
+        var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider, parameters);
         Navigate(viewModel);
     }
 
