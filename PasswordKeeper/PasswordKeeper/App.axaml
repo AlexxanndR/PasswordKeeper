@@ -24,6 +24,7 @@
 	</Application.Styles>
 
 	<Application.Resources>
+		<FontFamily x:Key="PlayFont">avares://PasswordKeeper/Assets/Fonts#Play</FontFamily>
 		<converters:ThemeToIconConverter x:Key="ThemeToIconConverter" />
 	</Application.Resources>
 </Application>
