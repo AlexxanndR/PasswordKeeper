@@ -1,11 +1,15 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using PasswordKeeper.Models.Password;
+using PasswordKeeper.Navigation;
 
 namespace PasswordKeeper.ViewModels;
-public partial class PasswordViewModel : ViewModelBase
+public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
 {
     [ObservableProperty]
-    private string _icon;
+    private Password _password = new();
 
-    [ObservableProperty]
-    private string _name;
+    [RelayCommand]
+    private void OpenManager() 
+        => navigator.NavigateTo<PasswordManagerViewModel>();
 }
