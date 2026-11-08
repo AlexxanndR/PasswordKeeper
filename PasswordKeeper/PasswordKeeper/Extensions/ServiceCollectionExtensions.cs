@@ -15,7 +15,7 @@ public static partial class ServiceCollectionExtensions
     public static void AddViewModels(this IServiceCollection collection)
     {
         collection.AddSingleton<MainViewModel>();
-        collection.AddTransient<PasswordsListViewModel>();
+        collection.AddSingleton<PasswordsListViewModel>();
         collection.AddTransient<PasswordManagerViewModel>();
     }
 }
