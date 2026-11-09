@@ -1,5 +1,5 @@
 ﻿namespace PasswordKeeper.Models.Password;
-public class SocialNetworkInfo
+public class PlatformInfo
 {
     public string Icon { get; set; } = string.Empty;
 
