@@ -27,5 +27,6 @@
 		<FontFamily x:Key="PlayFont">avares://PasswordKeeper/Assets/Fonts#Play</FontFamily>
 		<converters:ThemeToIconConverter x:Key="ThemeToIconConverter" />
 		<converters:PasswordRevealToIconConverter x:Key="PasswordRevealToIconConverter" />
+		<converters:StringToImageConverter x:Key="StringToImageConverter" />
 	</Application.Resources>
 </Application>
