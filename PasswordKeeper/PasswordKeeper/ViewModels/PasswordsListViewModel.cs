@@ -1,7 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PasswordKeeper.Navigation;
-using PasswordKeeper.Services;
+using PasswordKeeper.Services.Passwords;
 using System.Collections.ObjectModel;
 
 namespace PasswordKeeper.ViewModels;
