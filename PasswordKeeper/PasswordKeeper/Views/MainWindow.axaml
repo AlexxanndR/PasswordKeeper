@@ -6,7 +6,7 @@
         xmlns:views="using:PasswordKeeper.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="PasswordKeeper.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/Logo/icon.ico"
         Title="PasswordKeeper">
         <views:MainView />
 </Window>

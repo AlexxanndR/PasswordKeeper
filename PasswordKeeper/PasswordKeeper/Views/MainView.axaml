@@ -41,6 +41,12 @@
 												Kind="{Binding IsDarkTheme, Converter={StaticResource ThemeToIconConverter}}"/>
 				</controls:FloatingButton>
 
+				<TextBlock Grid.Column="0" Grid.ColumnSpan="2"
+						   Text="PASSWORD KEEPER"
+						   FontFamily="{StaticResource PlayFont}" FontWeight="Bold" FontSize="26"
+						   Foreground="{DynamicResource SystemBaseHighColor}"
+						   HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
 			</Grid>
 		</Border>
 
