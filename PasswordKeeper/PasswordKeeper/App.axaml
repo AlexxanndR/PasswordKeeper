@@ -32,6 +32,14 @@
 				<SolidColorBrush Color="{DynamicResource SystemAccentColor}" Opacity="0.5"/>
 			</Setter>
 		</Style>
+
+		<!-- Same palette trap as TextBox: default selection highlight is invisible under ColorPaletteResources -->
+		<Style Selector="SelectableTextBlock">
+			<Setter Property="SelectionForegroundBrush" Value="{DynamicResource SystemBaseHighColor}"/>
+			<Setter Property="SelectionBrush">
+				<SolidColorBrush Color="{DynamicResource SystemAccentColor}" Opacity="0.5"/>
+			</Setter>
+		</Style>
 	</Application.Styles>
 
 	<Application.Resources>
