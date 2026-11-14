@@ -3,8 +3,10 @@ using PasswordKeeper.Navigation;
 using PasswordKeeper.ViewModels;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 
 namespace PasswordKeeper.Services.Passwords;
+
 public class PasswordsContainer(INavigator navigator)
 {
     private ObservableCollection<PasswordViewModel> _passwords = [];
@@ -15,8 +17,8 @@ public class PasswordsContainer(INavigator navigator)
 
     public void Load(IEnumerable<Password> passwords)
     {
-        _passwords.Clear();
-        foreach (var password in passwords)
-            _passwords.Add(new PasswordViewModel(navigator) { Password = password });
+        var viewModels = passwords
+            .Select(password => new PasswordViewModel(navigator) { Password = password });
+        _passwords = [with(viewModels)];
     }
 }
