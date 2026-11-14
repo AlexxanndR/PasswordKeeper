@@ -61,7 +61,10 @@ public partial class UnlockViewModel(
         IsBusy = true;
         try
         {
-            var result = await vaultManager.UnlockAsync(MasterPassword);
+            // Runs on the thread pool: UnlockAsync does heavy CPU work (PBKDF2)
+            // before its first real await, which would block the UI thread and
+            // prevent the busy spinner from ever rendering
+            var result = await Task.Run(() => vaultManager.UnlockAsync(MasterPassword));
 
             if (!result.IsSuccess)
             {
