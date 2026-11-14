@@ -19,6 +19,6 @@ public class PasswordsContainer(INavigator navigator)
     {
         var viewModels = passwords
             .Select(password => new PasswordViewModel(navigator) { Password = password });
-        _passwords = [with(viewModels)];
+        _passwords = [.. viewModels];
     }
 }
