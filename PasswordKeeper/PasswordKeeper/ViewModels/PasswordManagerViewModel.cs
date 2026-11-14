@@ -12,7 +12,8 @@ public partial class PasswordManagerViewModel(
     INavigator navigator,
     IconStore iconStore,
     IconImporter iconImporter,
-    PasswordsContainer passwordsContainer) : ViewModelBase
+    PasswordsContainer passwordsContainer,
+    PasswordsRepository passwordsRepository) : ViewModelBase
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
@@ -36,6 +37,9 @@ public partial class PasswordManagerViewModel(
 
     [ObservableProperty]
     private string? _importSuccess;
+
+    [ObservableProperty]
+    private string? _saveError;
 
     public ObservableCollection<string> AvailableIcons { get; } = [.. IconProvider.Icons, .. iconStore.Icons];
 
@@ -82,15 +86,26 @@ public partial class PasswordManagerViewModel(
         => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(PasswordValue);
 
     [RelayCommand(CanExecute = nameof(CanSave))]
-    private void Save()
+    private async Task Save()
     {
-        passwordsContainer.Add(new Password
+        SaveError = null;
+
+        var password = new Password
         {
             Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
             Value = PasswordValue
-        });
+        };
 
-        navigator.GoBackward();
+        // Write to the encrypted vault first; only show it in the list once saved
+        var result = await passwordsRepository.AddAsync(password);
+        if (!result.IsSuccess)
+        {
+            SaveError = result.Message;
+            return;
+        }
+
+        passwordsContainer.Add(password);
+        await navigator.GoBackward();
     }
 
     [RelayCommand]
