@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+			 xmlns:controls="using:Material.Styles.Controls"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+			 xmlns:local="using:PasswordKeeper.Views"
+			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:vm="using:PasswordKeeper.ViewModels"
+			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+			 x:Class="PasswordKeeper.Views.UnlockView"
+			 x:DataType="vm:UnlockViewModel">
+	<UserControl.KeyBindings>
+		<KeyBinding Gesture="Enter" Command="{Binding UnlockCommand}"/>
+	</UserControl.KeyBindings>
+
+	<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+		  Background="{DynamicResource SystemRegionColor}">
+
+		<StackPanel MaxWidth="500"
+					HorizontalAlignment="Stretch" VerticalAlignment="Center"
+					Spacing="10">
+
+			<materialIcons:MaterialIcon Width="48" Height="48"
+										HorizontalAlignment="Center"
+										Kind="LockOutline"/>
+
+			<TextBlock FontSize="20"
+					   FontFamily="{StaticResource PlayFont}"
+					   HorizontalAlignment="Center"
+					   IsVisible="{Binding IsFirstRun}"
+					   Text="Create master password"/>
+			<TextBlock FontSize="20"
+					   FontFamily="{StaticResource PlayFont}"
+					   HorizontalAlignment="Center"
+					   IsVisible="{Binding !IsFirstRun}"
+					   Text="Unlock"/>
+
+			<!-- Unlock errors (wrong password, mismatch) -->
+			<TextBlock Foreground="#D32F2F" FontSize="12"
+					   HorizontalAlignment="Center"
+					   TextWrapping="Wrap"
+					   Text="{Binding Error}"
+					   IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
+
+			<!-- Master password field with reveal toggle -->
+			<StackPanel Spacing="2">
+				<TextBlock Text="Master password"
+						   FontSize="12"
+						   FontFamily="{StaticResource PlayFont}"
+						   Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
+				<Grid>
+					<TextBox FontFamily="{StaticResource PlayFont}"
+							 Padding="8 2 40 2"
+							 PasswordChar="•"
+							 RevealPassword="{Binding IsPasswordRevealed}"
+							 Text="{Binding MasterPassword}"/>
+					<Button Theme="{StaticResource MaterialFlatButton}"
+							Classes="Mini" Margin="0 0 4 0"
+							HorizontalAlignment="Right" VerticalAlignment="Center"
+							Background="Transparent"
+							Command="{Binding TogglePasswordRevealCommand}">
+						<materialIcons:MaterialIcon Width="22" Height="22"
+													Kind="{Binding IsPasswordRevealed, Converter={StaticResource PasswordRevealToIconConverter}}"/>
+					</Button>
+				</Grid>
+			</StackPanel>
+
+			<!-- Confirmation field, only when creating the vault -->
+			<StackPanel Spacing="2" IsVisible="{Binding IsFirstRun}">
+				<TextBlock Text="Confirm master password"
+						   FontSize="12"
+						   FontFamily="{StaticResource PlayFont}"
+						   Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
+				<TextBox FontFamily="{StaticResource PlayFont}"
+						 Padding="8 2"
+						 PasswordChar="•"
+						 RevealPassword="{Binding IsPasswordRevealed}"
+						 Text="{Binding ConfirmPassword}"/>
+			</StackPanel>
+		</StackPanel>
+
+		<controls:FloatingButton Margin="15"
+								 HorizontalAlignment="Right" VerticalAlignment="Bottom"
+								 Classes="Mini"
+								 Background="{DynamicResource SystemAccentColor}"
+								 ToolTip.Tip="Unlock"
+								 Command="{Binding UnlockCommand}">
+			<materialIcons:MaterialIcon Width="25" Height="25"
+										Foreground="Black"
+										Kind="LockOpen"/>
+		</controls:FloatingButton>
+	</Grid>
+</UserControl>
