@@ -16,9 +16,12 @@
     <PackageVersion Include="Avalonia.Android" Version="11.3.9" />
     <PackageVersion Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3" />
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageVersion Include="EFCore.NamingConventions" Version="9.0.0" />
     <PackageVersion Include="Material.Avalonia" Version="3.13.4" />
     <PackageVersion Include="Material.Icons.Avalonia" Version="2.4.1" />
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite.Core" Version="9.0.23" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.23" />
+    <PackageVersion Include="SQLitePCLRaw.bundle_e_sqlcipher" Version="2.1.11" />
     <PackageVersion Include="Xamarin.AndroidX.Core.SplashScreen" Version="1.0.1.15" />
   </ItemGroup>
 </Project>
