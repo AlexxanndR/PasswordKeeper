@@ -38,6 +38,9 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
         Navigate(viewModel);
     }
 
+    public void NavigateReplacing<TViewModel>() where TViewModel : class
+        => CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
+
     private void Navigate(object viewModel)
     {
         if (_currentViewModel != null)

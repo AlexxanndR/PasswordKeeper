@@ -15,4 +15,6 @@ public interface INavigator
     void NavigateTo<TViewModel>() where TViewModel : class;
     void NavigateTo<TViewModel, TParam>(params TParam[] parameter) where TViewModel : class;
 
+    void NavigateReplacing<TViewModel>() where TViewModel : class;
+
 }
