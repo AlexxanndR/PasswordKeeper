@@ -20,7 +20,7 @@ public partial class MainViewModel : ViewModelBase
     {
         _navigator = navigator;
         _navigator.NavigationChanged += NavigationHandler;
-        _navigator.NavigateTo<PasswordsListViewModel>();
+        _navigator.NavigateTo<UnlockViewModel>();
     }
 
     private void NavigationHandler(object? sender, NavigationEventArgs args)

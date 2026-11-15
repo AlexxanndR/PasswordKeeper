@@ -18,8 +18,8 @@ public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
         => IsPasswordVisible ? Password.Value : new string('•', Password.Value.Length);
 
     [RelayCommand]
-    private void OpenManager() 
-        => navigator.NavigateTo<PasswordManagerViewModel>();
+    private void OpenManager()
+        => navigator.NavigateTo<PasswordManagerViewModel, Password>(Password);
 
     [RelayCommand]
     private void TogglePasswordVisibility()
