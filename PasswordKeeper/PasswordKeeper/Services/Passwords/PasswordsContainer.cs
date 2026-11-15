@@ -15,6 +15,13 @@ public class PasswordsContainer(INavigator navigator)
     public void Add(Password password)
         => _passwords.Add(new PasswordViewModel(navigator) { Password = password });
 
+    public void Update(Password password)
+    {
+        var viewModel = _passwords.FirstOrDefault(vm => vm.Password.Id == password.Id);
+        if (viewModel is not null)
+            viewModel.Password = password;
+    }
+
     public void Load(IEnumerable<Password> passwords)
     {
         var viewModels = passwords

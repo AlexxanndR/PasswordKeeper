@@ -13,15 +13,16 @@ public partial class PasswordManagerViewModel(
     IconStore iconStore,
     IconImporter iconImporter,
     PasswordsContainer passwordsContainer,
-    PasswordsRepository passwordsRepository) : ViewModelBase
+    PasswordsRepository passwordsRepository,
+    Password? password = null) : ViewModelBase
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    private string _name = string.Empty;
+    private string _name = password?.Platform.Name ?? string.Empty;
 
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
-    private string _passwordValue = string.Empty;
+    private string _value = password?.Value ?? string.Empty;
 
     [ObservableProperty]
     private bool _isPasswordRevealed;
@@ -30,7 +31,9 @@ public partial class PasswordManagerViewModel(
     private bool _isIconPickerOpen;
 
     [ObservableProperty]
-    private string? _selectedIcon = IconProvider.DefaultIcon;
+    private string? _selectedIcon = string.IsNullOrEmpty(password?.Platform.Icon)
+        ? IconProvider.DefaultIcon
+        : password.Platform.Icon;
 
     [ObservableProperty]
     private string? _importError;
@@ -83,17 +86,25 @@ public partial class PasswordManagerViewModel(
     }
 
     private bool CanSave()
-        => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(PasswordValue);
+        => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Value);
 
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task Save()
     {
         SaveError = null;
 
+        if (password is { } editPassword)
+            await SaveEdited(editPassword.Id);
+        else
+            await SaveNew();
+    }
+
+    private async Task SaveNew()
+    {
         var password = new Password
         {
             Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
-            Value = PasswordValue
+            Value = Value
         };
 
         // Write to the encrypted vault first; only show it in the list once saved
@@ -105,6 +116,27 @@ public partial class PasswordManagerViewModel(
         }
 
         passwordsContainer.Add(password);
+        await navigator.GoBackward();
+    }
+
+    private async Task SaveEdited(int passwordId)
+    {
+        var password = new Password
+        {
+            Id = passwordId,
+            Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
+            Value = Value
+        };
+
+        // Write to the encrypted vault first; only refresh the list row once saved
+        var result = await passwordsRepository.UpdateAsync(password);
+        if (!result.IsSuccess)
+        {
+            SaveError = result.Message;
+            return;
+        }
+
+        passwordsContainer.Update(password);
         await navigator.GoBackward();
     }
 
