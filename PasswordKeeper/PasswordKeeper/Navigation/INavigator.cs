@@ -13,7 +13,7 @@ public interface INavigator
     Task GoBackward();
 
     void NavigateTo<TViewModel>() where TViewModel : class;
-    void NavigateTo<TViewModel, TParam>(params TParam[] parameter) where TViewModel : class;
+    void NavigateTo<TViewModel, TParam>(params TParam[] parameter) where TViewModel : class where TParam : class;
 
     void NavigateReplacing<TViewModel>() where TViewModel : class;
 

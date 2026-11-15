@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace PasswordKeeper.Navigation;
+
 public class Navigator(IServiceProvider serviceProvider) : INavigator
 {
     private readonly IServiceProvider _serviceProvider = serviceProvider;
@@ -26,13 +27,15 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
     }
 
     public bool CanBackward => _history.Count > 0;
-    
+
     public event EventHandler<NavigationEventArgs>? NavigationChanged;
 
     public void NavigateTo<TViewModel>() where TViewModel : class
         => Navigate(_serviceProvider.GetRequiredService<TViewModel>());
 
-    public void NavigateTo<TViewModel, TParam>(params TParam[] parameters) where TViewModel : class
+    public void NavigateTo<TViewModel, TParam>(params TParam[] parameters)
+        where TViewModel : class
+        where TParam : class
     {
         var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider, parameters);
         Navigate(viewModel);
@@ -50,7 +53,7 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
 
     public async Task GoBackward()
     {
-        if (!CanBackward) 
+        if (!CanBackward)
             return;
 
         var prevViewModel = _currentViewModel;
