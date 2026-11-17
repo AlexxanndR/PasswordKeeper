@@ -6,6 +6,7 @@
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 			 xmlns:vm="using:PasswordKeeper.ViewModels"
 			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+			 xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
 			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
 			 x:Class="PasswordKeeper.Views.UnlockView"
 			 x:DataType="vm:UnlockViewModel">
@@ -68,40 +69,33 @@
 					   IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
 
 			<!-- Master password field with reveal toggle -->
-			<StackPanel Spacing="2">
-				<TextBlock Text="Master password"
-						   FontSize="12"
-						   FontFamily="{StaticResource PlayFont}"
-						   Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
-				<Grid>
-					<TextBox FontFamily="{StaticResource PlayFont}"
-							 Padding="8 2 40 2"
-							 PasswordChar="•"
-							 RevealPassword="{Binding IsPasswordRevealed}"
-							 Text="{Binding MasterPassword}"/>
-					<Button Theme="{StaticResource MaterialFlatButton}"
-							Classes="Mini" Margin="0 0 4 0"
-							HorizontalAlignment="Right" VerticalAlignment="Center"
-							Background="Transparent"
-							Command="{Binding TogglePasswordRevealCommand}">
-						<materialIcons:MaterialIcon Width="22" Height="22"
-													Kind="{Binding IsPasswordRevealed, Converter={StaticResource PasswordRevealToIconConverter}}"/>
-					</Button>
-				</Grid>
-			</StackPanel>
-
-			<!-- Confirmation field, only when creating the vault -->
-			<StackPanel Spacing="2" IsVisible="{Binding IsFirstRun}">
-				<TextBlock Text="Confirm master password"
-						   FontSize="12"
-						   FontFamily="{StaticResource PlayFont}"
-						   Foreground="{DynamicResource SystemBaseMediumHighColor}"/>
+			<Grid>
 				<TextBox FontFamily="{StaticResource PlayFont}"
-						 Padding="8 2"
+						 Padding="8 2 40 2"
+						 UseFloatingWatermark="True"
+						 assists:TextFieldAssist.Label="Master password"
 						 PasswordChar="•"
 						 RevealPassword="{Binding IsPasswordRevealed}"
-						 Text="{Binding ConfirmPassword}"/>
-			</StackPanel>
+						 Text="{Binding MasterPassword}"/>
+				<Button Theme="{StaticResource MaterialFlatButton}"
+						Classes="Mini" Margin="0 0 4 0"
+						HorizontalAlignment="Right" VerticalAlignment="Center"
+						Background="Transparent"
+						Command="{Binding TogglePasswordRevealCommand}">
+					<materialIcons:MaterialIcon Width="22" Height="22"
+												Kind="{Binding IsPasswordRevealed, Converter={StaticResource PasswordRevealToIconConverter}}"/>
+				</Button>
+			</Grid>
+
+			<!-- Confirmation field, only when creating the vault -->
+			<TextBox FontFamily="{StaticResource PlayFont}"
+					 Padding="8 2"
+					 UseFloatingWatermark="True"
+					 assists:TextFieldAssist.Label="Confirm master password"
+					 IsVisible="{Binding IsFirstRun}"
+					 PasswordChar="•"
+					 RevealPassword="{Binding IsPasswordRevealed}"
+					 Text="{Binding ConfirmPassword}"/>
 		</StackPanel>
 
 		<controls:FloatingButton Margin="15"

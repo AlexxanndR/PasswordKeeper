@@ -1,5 +1,6 @@
 <Styles xmlns="https://github.com/avaloniaui"
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:controls="clr-namespace:Material.Styles.Controls;assembly=Material.Styles">
 
 	<!-- Compact, readable text fields: keep the caret and selected text readable regardless of theme defaults -->
 	<Style Selector="TextBox">
@@ -10,6 +11,14 @@
 		<Setter Property="SelectionBrush">
 			<SolidColorBrush Color="{DynamicResource SystemAccentColor}" Opacity="0.5"/>
 		</Setter>
+	</Style>
+
+	<Style Selector="TextBox:focus-within /template/ TextBlock#PART_LabelText">
+		<Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}"/>
+	</Style>
+
+	<Style Selector="TextBox /template/ controls|MaterialUnderline#PART_Underline">
+		<Setter Property="ActiveBrush" Value="{DynamicResource SystemAccentColor}"/>
 	</Style>
 
 	<!-- Same palette trap as TextBox: default selection highlight is invisible under ColorPaletteResources -->
