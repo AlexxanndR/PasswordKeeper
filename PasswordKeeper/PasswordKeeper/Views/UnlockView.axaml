@@ -61,13 +61,6 @@
 					   IsVisible="{Binding !IsFirstRun}"
 					   Text="Unlock"/>
 
-			<!-- Unlock errors (wrong password, mismatch) -->
-			<TextBlock Foreground="#D32F2F" FontSize="12"
-					   HorizontalAlignment="Center"
-					   TextWrapping="Wrap"
-					   Text="{Binding Error}"
-					   IsVisible="{Binding Error, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"/>
-
 			<!-- Master password field with reveal toggle -->
 			<Grid>
 				<TextBox FontFamily="{StaticResource PlayFont}"
