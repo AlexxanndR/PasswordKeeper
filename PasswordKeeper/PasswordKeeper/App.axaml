@@ -23,6 +23,7 @@
 		<themes:MaterialTheme BaseTheme="Inherit" />
 
 		<StyleInclude Source="avares://PasswordKeeper/Styles/TextStyles.axaml" />
+		<StyleInclude Source="avares://PasswordKeeper/Styles/NotificationStyles.axaml" />
 	</Application.Styles>
 
 	<Application.Resources>
