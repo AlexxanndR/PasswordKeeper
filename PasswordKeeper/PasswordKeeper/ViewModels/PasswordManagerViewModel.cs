@@ -1,20 +1,26 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+using Avalonia.Controls.Notifications;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using FluentValidation;
 using PasswordKeeper.Models.Password;
 using PasswordKeeper.Navigation;
 using PasswordKeeper.Services.Icons;
+using PasswordKeeper.Services.Notifications;
 using PasswordKeeper.Services.Passwords;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 
 namespace PasswordKeeper.ViewModels;
+
 public partial class PasswordManagerViewModel(
     INavigator navigator,
     IconStore iconStore,
     IconImporter iconImporter,
     PasswordsContainer passwordsContainer,
     PasswordsRepository passwordsRepository,
-    Password? password = null) : ViewModelBase
+    INotificationService notificationService,
+    IValidator<PasswordManagerViewModel> validator,
+    Password? password = null) : ValidatableViewModelBase<PasswordManagerViewModel>(validator)
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
@@ -35,15 +41,6 @@ public partial class PasswordManagerViewModel(
         ? IconProvider.DefaultIcon
         : password.Platform.Icon;
 
-    [ObservableProperty]
-    private string? _importError;
-
-    [ObservableProperty]
-    private string? _importSuccess;
-
-    [ObservableProperty]
-    private string? _saveError;
-
     public ObservableCollection<string> AvailableIcons { get; } = [.. IconProvider.Icons, .. iconStore.Icons];
 
     [RelayCommand]
@@ -55,29 +52,18 @@ public partial class PasswordManagerViewModel(
     {
         SelectedIcon = icon;
         IsIconPickerOpen = false;
-        ImportError = null;
-        ImportSuccess = null;
     }
 
     [RelayCommand]
     private async Task ImportIcon()
     {
-        ImportError = null;
-        ImportSuccess = null;
-
         // Null result: the user cancelled the dialog
         var result = await iconImporter.ImportAsync();
-        if (result is null)
-            return;
 
-        if (!result.IsSuccess)
-        {
-            ImportError = result.Message;
-            return;
-        }
+        if (result is not null)
+            notificationService.Show(result.Message, result.IsSuccess ? NotificationType.Success : NotificationType.Error);
 
-        ImportSuccess = result.Message;
-        if (result.Icon is { } icon)
+        if (result is { IsSuccess: true, Icon: { } icon })
         {
             if (!AvailableIcons.Contains(icon))
                 AvailableIcons.Add(icon);
@@ -85,14 +71,11 @@ public partial class PasswordManagerViewModel(
         }
     }
 
-    private bool CanSave()
-        => !string.IsNullOrWhiteSpace(Name) && !string.IsNullOrWhiteSpace(Value);
+    private bool CanSave() => IsValid;
 
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task Save()
     {
-        SaveError = null;
-
         if (password is { } editPassword)
             await SaveEdited(editPassword.Id);
         else
@@ -111,7 +94,7 @@ public partial class PasswordManagerViewModel(
         var result = await passwordsRepository.AddAsync(password);
         if (!result.IsSuccess)
         {
-            SaveError = result.Message;
+            notificationService.Show(result.Message, NotificationType.Error);
             return;
         }
 
@@ -132,7 +115,7 @@ public partial class PasswordManagerViewModel(
         var result = await passwordsRepository.UpdateAsync(password);
         if (!result.IsSuccess)
         {
-            SaveError = result.Message;
+            notificationService.Show(result.Message, NotificationType.Error);
             return;
         }
 

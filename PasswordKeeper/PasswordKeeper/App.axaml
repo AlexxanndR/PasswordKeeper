@@ -22,24 +22,8 @@
 		</FluentTheme>
 		<themes:MaterialTheme BaseTheme="Inherit" />
 
-		<!-- Compact, readable text fields: keep the caret and selected text readable regardless of theme defaults -->
-		<Style Selector="TextBox">
-			<Setter Property="Padding" Value="0 0"/>
-			<Setter Property="FontSize" Value="16"/>
-			<Setter Property="CaretBrush" Value="{DynamicResource SystemBaseHighColor}"/>
-			<Setter Property="SelectionForegroundBrush" Value="{DynamicResource SystemBaseHighColor}"/>
-			<Setter Property="SelectionBrush">
-				<SolidColorBrush Color="{DynamicResource SystemAccentColor}" Opacity="0.5"/>
-			</Setter>
-		</Style>
-
-		<!-- Same palette trap as TextBox: default selection highlight is invisible under ColorPaletteResources -->
-		<Style Selector="SelectableTextBlock">
-			<Setter Property="SelectionForegroundBrush" Value="{DynamicResource SystemBaseHighColor}"/>
-			<Setter Property="SelectionBrush">
-				<SolidColorBrush Color="{DynamicResource SystemAccentColor}" Opacity="0.5"/>
-			</Setter>
-		</Style>
+		<StyleInclude Source="avares://PasswordKeeper/Styles/TextStyles.axaml" />
+		<StyleInclude Source="avares://PasswordKeeper/Styles/NotificationStyles.axaml" />
 	</Application.Styles>
 
 	<Application.Resources>
