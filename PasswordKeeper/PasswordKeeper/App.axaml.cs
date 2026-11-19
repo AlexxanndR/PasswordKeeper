@@ -1,9 +1,11 @@
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
 using Mvvm.Navigation;
+using PasswordKeeper.Services.Notifications;
 using PasswordKeeper.ViewModels;
 using PasswordKeeper.Views;
 using System.Linq;
@@ -26,22 +28,36 @@ public partial class App : Application
         var services = collection.BuildServiceProvider();
 
         var vm = services.GetRequiredService<MainViewModel>();
+
+        // Avoid duplicate validations from both Avalonia and the CommunityToolkit.
+        // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
+        DisableAvaloniaDataAnnotationValidation();
+
+        var notifications = services.GetRequiredService<NotificationService>();
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Avoid duplicate validations from both Avalonia and the CommunityToolkit. 
-            // More info: https://docs.avaloniaui.net/docs/guides/development-guides/data-validation#manage-validationplugins
-            DisableAvaloniaDataAnnotationValidation();
             desktop.MainWindow = new MainWindow
             {
                 DataContext = vm
             };
+            notifications.Attach(desktop.MainWindow);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
-            singleViewPlatform.MainView = new MainView
+            var mainView = new MainView
             {
                 DataContext = vm
             };
+
+            // No TopLevel yet; the notification host binds once the view is attached
+            mainView.AttachedToVisualTree += (_, e) =>
+            {
+                if (e.Root is TopLevel topLevel)
+                    notifications.Attach(topLevel);
+            };
+
+            singleViewPlatform.MainView = mainView;
         }
 
         base.OnFrameworkInitializationCompleted();
