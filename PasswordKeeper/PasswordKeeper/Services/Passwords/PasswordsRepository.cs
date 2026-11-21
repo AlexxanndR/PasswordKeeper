@@ -51,4 +51,20 @@ public class PasswordsRepository(IDbContextFactory<VaultContext> contextFactory)
             return Result.Failure($"Could not update the password: {ex.Message}");
         }
     }
+
+    public async Task<Result> RemoveAsync(Password password, CancellationToken cancellationToken = default)
+    {
+        try
+        {
+            await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
+            context.Passwords.Remove(password);
+            await context.SaveChangesAsync(cancellationToken);
+
+            return Result.Success($"Removed \"{password.Platform.Name}\"");
+        }
+        catch (SqliteException ex)
+        {
+            return Result.Failure($"Could not remove the password: {ex.Message}");
+        }
+    }
 }
