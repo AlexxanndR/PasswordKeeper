@@ -1,11 +1,20 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System.Threading.Tasks;
+using Avalonia.Controls.Notifications;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PasswordKeeper.Models.Password;
 using PasswordKeeper.Navigation;
+using PasswordKeeper.Services.Notifications;
+using PasswordKeeper.Services.Passwords;
 
 namespace PasswordKeeper.ViewModels;
 
-public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
+public partial class PasswordViewModel(
+    INavigator navigator,
+    PasswordsContainer passwordsContainer,
+    PasswordsRepository passwordsRepository,
+    INotificationService notificationService
+) : ViewModelBase
 {
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayPassword))]
@@ -24,4 +33,18 @@ public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
 
     [RelayCommand]
     private void TogglePasswordVisibility() => IsPasswordVisible = !IsPasswordVisible;
+
+    [RelayCommand]
+    private async Task Remove()
+    {
+        var result = await passwordsRepository.RemoveAsync(Password);
+        if (!result.IsSuccess)
+        {
+            notificationService.Show(result.Message, NotificationType.Error);
+            return;
+        }
+
+        passwordsContainer.Remove(Password);
+        notificationService.Show(result.Message, NotificationType.Success);
+    }
 }
