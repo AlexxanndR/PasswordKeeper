@@ -24,10 +24,15 @@ public static partial class ServiceCollectionExtensions
         collection.AddSingleton<VaultManager>();
 
         collection.AddSingleton<NotificationService>();
-        collection.AddSingleton<INotificationService>(sp => sp.GetRequiredService<NotificationService>());
+        collection.AddSingleton<INotificationService>(sp =>
+            sp.GetRequiredService<NotificationService>()
+        );
 
         collection.AddSingleton<IValidator<UnlockViewModel>, UnlockViewModelValidator>();
-        collection.AddSingleton<IValidator<PasswordManagerViewModel>, PasswordManagerViewModelValidator>();
+        collection.AddSingleton<
+            IValidator<PasswordManagerViewModel>,
+            PasswordManagerViewModelValidator
+        >();
 
         collection.AddSingleton<IconImporter>();
         collection.AddSingleton<IDbContextFactory<VaultContext>, VaultContextFactory>();

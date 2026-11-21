@@ -17,10 +17,13 @@ public class VaultContext(DbContextOptions<VaultContext> options) : DbContext(op
             entity.HasKey(password => password.Id);
             entity.Property(password => password.Value).IsRequired();
 
-            entity.OwnsOne(password => password.Platform, platform =>
-            {
-                platform.Property(info => info.Name).IsRequired();
-            });
+            entity.OwnsOne(
+                password => password.Platform,
+                platform =>
+                {
+                    platform.Property(info => info.Name).IsRequired();
+                }
+            );
         });
     }
 }

@@ -4,6 +4,7 @@ using PasswordKeeper.Models.Password;
 using PasswordKeeper.Navigation;
 
 namespace PasswordKeeper.ViewModels;
+
 public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
 {
     [ObservableProperty]
@@ -14,14 +15,13 @@ public partial class PasswordViewModel(INavigator navigator) : ViewModelBase
     [NotifyPropertyChangedFor(nameof(DisplayPassword))]
     private bool _isPasswordVisible;
 
-    public string DisplayPassword
-        => IsPasswordVisible ? Password.Value : new string('•', Password.Value.Length);
+    public string DisplayPassword =>
+        IsPasswordVisible ? Password.Value : new string('•', Password.Value.Length);
 
     [RelayCommand]
-    private void OpenManager()
-        => navigator.NavigateTo<PasswordManagerViewModel, Password>(Password);
+    private void OpenManager() =>
+        navigator.NavigateTo<PasswordManagerViewModel, Password>(Password);
 
     [RelayCommand]
-    private void TogglePasswordVisibility()
-        => IsPasswordVisible = !IsPasswordVisible;
+    private void TogglePasswordVisibility() => IsPasswordVisible = !IsPasswordVisible;
 }

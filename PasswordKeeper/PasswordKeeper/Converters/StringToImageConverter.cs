@@ -1,12 +1,13 @@
-﻿using Avalonia.Data.Converters;
-using Avalonia.Media.Imaging;
-using Avalonia.Platform;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
+using Avalonia.Data.Converters;
+using Avalonia.Media.Imaging;
+using Avalonia.Platform;
 
 namespace PasswordKeeper.Converters;
+
 public class StringToImageConverter : IValueConverter
 {
     private static readonly ConcurrentDictionary<string, Bitmap> _bitmaps = new();
@@ -18,13 +19,16 @@ public class StringToImageConverter : IValueConverter
 
         try
         {
-            return _bitmaps.GetOrAdd(path, static p =>
-            {
-                using var stream = p.StartsWith("avares:", StringComparison.OrdinalIgnoreCase)
-                    ? AssetLoader.Open(new Uri(p))
-                    : File.OpenRead(p);
-                return new Bitmap(stream);
-            });
+            return _bitmaps.GetOrAdd(
+                path,
+                static p =>
+                {
+                    using var stream = p.StartsWith("avares:", StringComparison.OrdinalIgnoreCase)
+                        ? AssetLoader.Open(new Uri(p))
+                        : File.OpenRead(p);
+                    return new Bitmap(stream);
+                }
+            );
         }
         catch (Exception)
         {
@@ -33,7 +37,12 @@ public class StringToImageConverter : IValueConverter
     }
 
     // We don't need to convert back from image to path for this use case
-    public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+    public object? ConvertBack(
+        object? value,
+        Type targetType,
+        object? parameter,
+        CultureInfo culture
+    )
     {
         throw new NotSupportedException();
     }

@@ -1,11 +1,11 @@
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PasswordKeeper.Models.Password;
 using PasswordKeeper.Results;
 using PasswordKeeper.Services.Database;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PasswordKeeper.Services.Passwords;
 
@@ -14,13 +14,18 @@ namespace PasswordKeeper.Services.Passwords;
 /// </summary>
 public class PasswordsRepository(IDbContextFactory<VaultContext> contextFactory)
 {
-    public async Task<IReadOnlyList<Password>> LoadAllAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Password>> LoadAllAsync(
+        CancellationToken cancellationToken = default
+    )
     {
         await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
         return await context.Passwords.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<Result> AddAsync(Password password, CancellationToken cancellationToken = default)
+    public async Task<Result> AddAsync(
+        Password password,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {
@@ -36,7 +41,10 @@ public class PasswordsRepository(IDbContextFactory<VaultContext> contextFactory)
         }
     }
 
-    public async Task<Result> UpdateAsync(Password password, CancellationToken cancellationToken = default)
+    public async Task<Result> UpdateAsync(
+        Password password,
+        CancellationToken cancellationToken = default
+    )
     {
         try
         {

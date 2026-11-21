@@ -23,14 +23,15 @@ public partial class MainViewModel : ViewModelBase
         _navigator.NavigateTo<UnlockViewModel>();
     }
 
-    private void NavigationHandler(object? sender, NavigationEventArgs args)
-        => CurrentPage = args.NewViewModel;
+    private void NavigationHandler(object? sender, NavigationEventArgs args) =>
+        CurrentPage = args.NewViewModel;
 
     [RelayCommand]
     private void ToggleTheme()
     {
         IsDarkTheme = IsDarkTheme.HasValue && !IsDarkTheme.Value;
         if (Application.Current is { } app)
-            Application.Current.RequestedThemeVariant = IsDarkTheme.HasValue && IsDarkTheme.Value ? ThemeVariant.Dark : ThemeVariant.Light;
+            Application.Current.RequestedThemeVariant =
+                IsDarkTheme.HasValue && IsDarkTheme.Value ? ThemeVariant.Dark : ThemeVariant.Light;
     }
 }

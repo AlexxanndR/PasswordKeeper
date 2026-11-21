@@ -7,10 +7,8 @@ public sealed class PasswordManagerViewModelValidator : AbstractValidator<Passwo
 {
     public PasswordManagerViewModelValidator()
     {
-        RuleFor(vm => vm.Name)
-            .NotEmpty().WithMessage("Platform is required");
+        RuleFor(vm => vm.Name).NotEmpty().WithMessage("Platform is required");
 
-        RuleFor(vm => vm.Value)
-            .NotEmpty().WithMessage("Password is required");
+        RuleFor(vm => vm.Value).NotEmpty().WithMessage("Password is required");
     }
 }
