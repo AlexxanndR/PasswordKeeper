@@ -1,105 +1,136 @@
-<UserControl xmlns="https://github.com/avaloniaui"
-			 xmlns:controls="using:Material.Styles.Controls"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-			 xmlns:local="using:PasswordKeeper.Views"
-			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-			 xmlns:vm="using:PasswordKeeper.ViewModels"
-			 xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
-			 xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
-			 mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-			 x:Class="PasswordKeeper.Views.UnlockView"
-			 x:DataType="vm:UnlockViewModel">
-	<UserControl.KeyBindings>
-		<KeyBinding Gesture="Enter" Command="{Binding UnlockCommand}"/>
-	</UserControl.KeyBindings>
+<UserControl
+  xmlns="https://github.com/avaloniaui"
+  xmlns:controls="using:Material.Styles.Controls"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+  xmlns:local="using:PasswordKeeper.Views"
+  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+  xmlns:vm="using:PasswordKeeper.ViewModels"
+  xmlns:materialIcons="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+  xmlns:assists="clr-namespace:Material.Styles.Assists;assembly=Material.Styles"
+  mc:Ignorable="d"
+  d:DesignWidth="800"
+  d:DesignHeight="450"
+  x:Class="PasswordKeeper.Views.UnlockView"
+  x:DataType="vm:UnlockViewModel"
+>
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Enter" Command="{Binding UnlockCommand}" />
+  </UserControl.KeyBindings>
 
-	<UserControl.Styles>
-		<!-- Slowly rotating icon used as a busy spinner -->
-		<Style Selector="materialIcons|MaterialIcon.Spinner">
-			<Style.Animations>
-				<Animation Duration="0:0:1.2" IterationCount="Infinite">
-					<KeyFrame Cue="0%">
-						<Setter Property="RotateTransform.Angle" Value="0"/>
-					</KeyFrame>
-					<KeyFrame Cue="100%">
-						<Setter Property="RotateTransform.Angle" Value="360"/>
-					</KeyFrame>
-				</Animation>
-			</Style.Animations>
-		</Style>
-	</UserControl.Styles>
+  <UserControl.Styles>
+    <!-- Slowly rotating icon used as a busy spinner -->
+    <Style Selector="materialIcons|MaterialIcon.Spinner">
+      <Style.Animations>
+        <Animation Duration="0:0:1.2" IterationCount="Infinite">
+          <KeyFrame Cue="0%">
+            <Setter Property="RotateTransform.Angle" Value="0" />
+          </KeyFrame>
+          <KeyFrame Cue="100%">
+            <Setter Property="RotateTransform.Angle" Value="360" />
+          </KeyFrame>
+        </Animation>
+      </Style.Animations>
+    </Style>
+  </UserControl.Styles>
 
-	<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-		  Background="{DynamicResource SystemRegionColor}">
+  <Grid
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    Background="{DynamicResource SystemRegionColor}"
+  >
+    <!-- Busy spinner replaces the form while unlocking / creating the vault -->
+    <materialIcons:MaterialIcon
+      Classes="Spinner"
+      Width="48"
+      Height="48"
+      HorizontalAlignment="Center"
+      VerticalAlignment="Center"
+      Foreground="{DynamicResource SystemAccentColor}"
+      Kind="Loading"
+      IsVisible="{Binding IsBusy}"
+    />
 
-		<!-- Busy spinner replaces the form while unlocking / creating the vault -->
-		<materialIcons:MaterialIcon Classes="Spinner"
-									Width="48" Height="48"
-									HorizontalAlignment="Center" VerticalAlignment="Center"
-									Foreground="{DynamicResource SystemAccentColor}"
-									Kind="Loading"
-									IsVisible="{Binding IsBusy}"/>
+    <StackPanel
+      MaxWidth="500"
+      HorizontalAlignment="Stretch"
+      VerticalAlignment="Center"
+      Spacing="10"
+      IsVisible="{Binding !IsBusy}"
+    >
+      <materialIcons:MaterialIcon
+        Width="48"
+        Height="48"
+        HorizontalAlignment="Center"
+        Kind="LockOutline"
+      />
 
-		<StackPanel MaxWidth="500"
-					HorizontalAlignment="Stretch" VerticalAlignment="Center"
-					Spacing="10"
-					IsVisible="{Binding !IsBusy}">
+      <TextBlock
+        FontSize="20"
+        FontFamily="{StaticResource PlayFont}"
+        HorizontalAlignment="Center"
+        IsVisible="{Binding IsFirstRun}"
+        Text="Create master password"
+      />
+      <TextBlock
+        FontSize="20"
+        FontFamily="{StaticResource PlayFont}"
+        HorizontalAlignment="Center"
+        IsVisible="{Binding !IsFirstRun}"
+        Text="Unlock"
+      />
 
-			<materialIcons:MaterialIcon Width="48" Height="48"
-										HorizontalAlignment="Center"
-										Kind="LockOutline"/>
+      <!-- Master password field with reveal toggle -->
+      <Grid>
+        <TextBox
+          FontFamily="{StaticResource PlayFont}"
+          Padding="8 2 40 2"
+          UseFloatingWatermark="True"
+          assists:TextFieldAssist.Label="Master password"
+          PasswordChar="•"
+          RevealPassword="{Binding IsPasswordRevealed}"
+          Text="{Binding MasterPassword}"
+        />
+        <Button
+          Theme="{StaticResource MaterialFlatButton}"
+          Classes="Mini"
+          Margin="0 0 4 0"
+          HorizontalAlignment="Right"
+          VerticalAlignment="Center"
+          Background="Transparent"
+          Command="{Binding TogglePasswordRevealCommand}"
+        >
+          <materialIcons:MaterialIcon
+            Width="22"
+            Height="22"
+            Kind="{Binding IsPasswordRevealed, Converter={StaticResource PasswordRevealToIconConverter}}"
+          />
+        </Button>
+      </Grid>
 
-			<TextBlock FontSize="20"
-					   FontFamily="{StaticResource PlayFont}"
-					   HorizontalAlignment="Center"
-					   IsVisible="{Binding IsFirstRun}"
-					   Text="Create master password"/>
-			<TextBlock FontSize="20"
-					   FontFamily="{StaticResource PlayFont}"
-					   HorizontalAlignment="Center"
-					   IsVisible="{Binding !IsFirstRun}"
-					   Text="Unlock"/>
+      <!-- Confirmation field, only when creating the vault -->
+      <TextBox
+        FontFamily="{StaticResource PlayFont}"
+        Padding="8 2"
+        UseFloatingWatermark="True"
+        assists:TextFieldAssist.Label="Confirm master password"
+        IsVisible="{Binding IsFirstRun}"
+        PasswordChar="•"
+        RevealPassword="{Binding IsPasswordRevealed}"
+        Text="{Binding ConfirmPassword}"
+      />
+    </StackPanel>
 
-			<!-- Master password field with reveal toggle -->
-			<Grid>
-				<TextBox FontFamily="{StaticResource PlayFont}"
-						 Padding="8 2 40 2"
-						 UseFloatingWatermark="True"
-						 assists:TextFieldAssist.Label="Master password"
-						 PasswordChar="•"
-						 RevealPassword="{Binding IsPasswordRevealed}"
-						 Text="{Binding MasterPassword}"/>
-				<Button Theme="{StaticResource MaterialFlatButton}"
-						Classes="Mini" Margin="0 0 4 0"
-						HorizontalAlignment="Right" VerticalAlignment="Center"
-						Background="Transparent"
-						Command="{Binding TogglePasswordRevealCommand}">
-					<materialIcons:MaterialIcon Width="22" Height="22"
-												Kind="{Binding IsPasswordRevealed, Converter={StaticResource PasswordRevealToIconConverter}}"/>
-				</Button>
-			</Grid>
-
-			<!-- Confirmation field, only when creating the vault -->
-			<TextBox FontFamily="{StaticResource PlayFont}"
-					 Padding="8 2"
-					 UseFloatingWatermark="True"
-					 assists:TextFieldAssist.Label="Confirm master password"
-					 IsVisible="{Binding IsFirstRun}"
-					 PasswordChar="•"
-					 RevealPassword="{Binding IsPasswordRevealed}"
-					 Text="{Binding ConfirmPassword}"/>
-		</StackPanel>
-
-		<controls:FloatingButton Margin="15"
-								 HorizontalAlignment="Right" VerticalAlignment="Bottom"
-								 Classes="Mini"
-								 Background="{DynamicResource SystemAccentColor}"
-								 ToolTip.Tip="Unlock"
-								 Command="{Binding UnlockCommand}">
-			<materialIcons:MaterialIcon Width="25" Height="25"
-										Foreground="Black"
-										Kind="LockOpen"/>
-		</controls:FloatingButton>
-	</Grid>
+    <controls:FloatingButton
+      Margin="15"
+      HorizontalAlignment="Right"
+      VerticalAlignment="Bottom"
+      Classes="Mini"
+      Background="{DynamicResource SystemAccentColor}"
+      ToolTip.Tip="Unlock"
+      Command="{Binding UnlockCommand}"
+    >
+      <materialIcons:MaterialIcon Width="25" Height="25" Foreground="Black" Kind="LockOpen" />
+    </controls:FloatingButton>
+  </Grid>
 </UserControl>

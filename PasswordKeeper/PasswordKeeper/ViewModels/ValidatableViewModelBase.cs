@@ -1,10 +1,10 @@
-using FluentValidation;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using FluentValidation;
 
 namespace PasswordKeeper.ViewModels;
 
@@ -32,8 +32,7 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
     /// <summary>
     /// Runs the validator without surfacing errors — for CanExecute checks.
     /// </summary>
-    protected bool IsValid
-        => _validator.Validate((T)this).IsValid;
+    protected bool IsValid => _validator.Validate((T)this).IsValid;
 
     /// <summary>
     /// Attaches an operation result to the field it belongs to (e.g. wrong master password).
@@ -53,10 +52,8 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
 
     public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
-    public IEnumerable GetErrors(string? propertyName)
-        => propertyName is { } name && _errors.TryGetValue(name, out var errors)
-            ? errors
-            : [];
+    public IEnumerable GetErrors(string? propertyName) =>
+        propertyName is { } name && _errors.TryGetValue(name, out var errors) ? errors : [];
 
     private void OnAnyPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -73,12 +70,14 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
     {
         // Whole-object validation keeps cross-field rules (e.g. password match) in sync
         // no matter which side of the pair changed
-        var failures = _validator.Validate((T)this).Errors
-            .Where(failure => _touched.Contains(failure.PropertyName))
+        var failures = _validator
+            .Validate((T)this)
+            .Errors.Where(failure => _touched.Contains(failure.PropertyName))
             .GroupBy(failure => failure.PropertyName)
-            .ToDictionary(group => group.Key, group => group
-                .Select(failure => failure.ErrorMessage)
-                .ToArray());
+            .ToDictionary(
+                group => group.Key,
+                group => group.Select(failure => failure.ErrorMessage).ToArray()
+            );
 
         foreach (var (name, message) in _manualErrors)
             failures[name] = [.. failures.GetValueOrDefault(name, []), message];

@@ -1,3 +1,5 @@
+using System.Collections.ObjectModel;
+using System.Threading.Tasks;
 using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -7,8 +9,6 @@ using PasswordKeeper.Navigation;
 using PasswordKeeper.Services.Icons;
 using PasswordKeeper.Services.Notifications;
 using PasswordKeeper.Services.Passwords;
-using System.Collections.ObjectModel;
-using System.Threading.Tasks;
 
 namespace PasswordKeeper.ViewModels;
 
@@ -20,7 +20,8 @@ public partial class PasswordManagerViewModel(
     PasswordsRepository passwordsRepository,
     INotificationService notificationService,
     IValidator<PasswordManagerViewModel> validator,
-    Password? password = null) : ValidatableViewModelBase<PasswordManagerViewModel>(validator)
+    Password? password = null
+) : ValidatableViewModelBase<PasswordManagerViewModel>(validator)
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(SaveCommand))]
@@ -41,11 +42,11 @@ public partial class PasswordManagerViewModel(
         ? IconProvider.DefaultIcon
         : password.Platform.Icon;
 
-    public ObservableCollection<string> AvailableIcons { get; } = [.. IconProvider.Icons, .. iconStore.Icons];
+    public ObservableCollection<string> AvailableIcons { get; } =
+    [.. IconProvider.Icons, .. iconStore.Icons];
 
     [RelayCommand]
-    private void TogglePasswordReveal()
-        => IsPasswordRevealed = !IsPasswordRevealed;
+    private void TogglePasswordReveal() => IsPasswordRevealed = !IsPasswordRevealed;
 
     [RelayCommand]
     private void SelectIcon(string icon)
@@ -61,7 +62,10 @@ public partial class PasswordManagerViewModel(
         var result = await iconImporter.ImportAsync();
 
         if (result is not null)
-            notificationService.Show(result.Message, result.IsSuccess ? NotificationType.Success : NotificationType.Error);
+            notificationService.Show(
+                result.Message,
+                result.IsSuccess ? NotificationType.Success : NotificationType.Error
+            );
 
         if (result is { IsSuccess: true, Icon: { } icon })
         {
@@ -87,7 +91,7 @@ public partial class PasswordManagerViewModel(
         var password = new Password
         {
             Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
-            Value = Value
+            Value = Value,
         };
 
         // Write to the encrypted vault first; only show it in the list once saved
@@ -108,7 +112,7 @@ public partial class PasswordManagerViewModel(
         {
             Id = passwordId,
             Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
-            Value = Value
+            Value = Value,
         };
 
         // Write to the encrypted vault first; only refresh the list row once saved
@@ -124,6 +128,5 @@ public partial class PasswordManagerViewModel(
     }
 
     [RelayCommand]
-    private void Close()
-        => navigator.GoBackward();
+    private void Close() => navigator.GoBackward();
 }

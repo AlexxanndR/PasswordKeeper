@@ -1,10 +1,10 @@
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
-using PasswordKeeper.Results;
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
+using PasswordKeeper.Results;
 
 namespace PasswordKeeper.Services.Database;
 
@@ -23,7 +23,10 @@ public class VaultManager
         _connectionString ?? throw new InvalidOperationException("The vault has not been unlocked");
 
     public string VaultDirectory { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "PasswordKeeper");
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "PasswordKeeper"
+        );
 
     public string DatabasePath => Path.Combine(VaultDirectory, "passwords.db");
     public string SaltPath => Path.Combine(VaultDirectory, "vault.salt");
@@ -42,7 +45,7 @@ public class VaultManager
             var builder = new SqliteConnectionStringBuilder
             {
                 DataSource = DatabasePath,
-                Password = $"x'{Convert.ToHexString(key)}'"
+                Password = $"x'{Convert.ToHexString(key)}'",
             };
             _connectionString = builder.ToString();
 
@@ -50,7 +53,8 @@ public class VaultManager
                 new DbContextOptionsBuilder<VaultContext>()
                     .UseSqlite(_connectionString)
                     .UseSnakeCaseNamingConvention()
-                    .Options);
+                    .Options
+            );
 
             // Opens the database with the key: a wrong key fails here as "file is not a database"
             await probe.Database.EnsureCreatedAsync();
@@ -60,9 +64,9 @@ public class VaultManager
         catch (SqliteException)
         {
             _connectionString = null;
-            return VaultUnlockResult.Failure(exist
-                ? "Incorrect master password"
-                : "Could not create the vault database");
+            return VaultUnlockResult.Failure(
+                exist ? "Incorrect master password" : "Could not create the vault database"
+            );
         }
     }
 
@@ -77,6 +81,12 @@ public class VaultManager
         return salt;
     }
 
-    private static byte[] DeriveKey(string masterPassword, byte[] salt)
-        => Rfc2898DeriveBytes.Pbkdf2(masterPassword, salt, Pbkdf2Iterations, HashAlgorithmName.SHA256, KeySizeBytes);
+    private static byte[] DeriveKey(string masterPassword, byte[] salt) =>
+        Rfc2898DeriveBytes.Pbkdf2(
+            masterPassword,
+            salt,
+            Pbkdf2Iterations,
+            HashAlgorithmName.SHA256,
+            KeySizeBytes
+        );
 }

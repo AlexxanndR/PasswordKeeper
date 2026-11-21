@@ -1,10 +1,10 @@
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentValidation;
 using PasswordKeeper.Navigation;
 using PasswordKeeper.Services.Database;
 using PasswordKeeper.Services.Passwords;
-using System.Threading.Tasks;
 
 namespace PasswordKeeper.ViewModels;
 
@@ -13,7 +13,8 @@ public partial class UnlockViewModel(
     VaultManager vaultManager,
     PasswordsRepository passwordsRepository,
     PasswordsContainer passwordsContainer,
-    IValidator<UnlockViewModel> validator) : ValidatableViewModelBase<UnlockViewModel>(validator)
+    IValidator<UnlockViewModel> validator
+) : ValidatableViewModelBase<UnlockViewModel>(validator)
 {
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UnlockCommand))]
@@ -32,8 +33,7 @@ public partial class UnlockViewModel(
 
     public bool IsFirstRun { get; } = vaultManager.IsFirstRun;
 
-    private bool CanUnlock()
-        => !IsBusy && IsValid;
+    private bool CanUnlock() => !IsBusy && IsValid;
 
     [RelayCommand(CanExecute = nameof(CanUnlock))]
     private async Task Unlock()
@@ -62,6 +62,5 @@ public partial class UnlockViewModel(
     }
 
     [RelayCommand]
-    private void TogglePasswordReveal()
-        => IsPasswordRevealed = !IsPasswordRevealed;
+    private void TogglePasswordReveal() => IsPasswordRevealed = !IsPasswordRevealed;
 }

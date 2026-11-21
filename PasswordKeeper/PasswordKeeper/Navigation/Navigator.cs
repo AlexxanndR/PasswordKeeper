@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace PasswordKeeper.Navigation;
 
@@ -17,7 +17,8 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
         get => _currentViewModel;
         private set
         {
-            if (_currentViewModel == value) return;
+            if (_currentViewModel == value)
+                return;
 
             var prevViewModel = _currentViewModel;
             _currentViewModel = value;
@@ -30,8 +31,8 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
 
     public event EventHandler<NavigationEventArgs>? NavigationChanged;
 
-    public void NavigateTo<TViewModel>() where TViewModel : class
-        => Navigate(_serviceProvider.GetRequiredService<TViewModel>());
+    public void NavigateTo<TViewModel>()
+        where TViewModel : class => Navigate(_serviceProvider.GetRequiredService<TViewModel>());
 
     public void NavigateTo<TViewModel, TParam>(params TParam[] parameters)
         where TViewModel : class
@@ -41,8 +42,9 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
         Navigate(viewModel);
     }
 
-    public void NavigateReplacing<TViewModel>() where TViewModel : class
-        => CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
+    public void NavigateReplacing<TViewModel>()
+        where TViewModel : class =>
+        CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
 
     private void Navigate(object viewModel)
     {
@@ -60,7 +62,9 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
         _currentViewModel = _history.Pop();
         NavigationChanged?.Invoke(this, new(prevViewModel, _currentViewModel, NavigationMode.BACK));
 
-        if (prevViewModel is IAsyncDisposable asyncDisposable) await asyncDisposable.DisposeAsync();
-        else if (prevViewModel is IDisposable disposable) disposable.Dispose();
+        if (prevViewModel is IAsyncDisposable asyncDisposable)
+            await asyncDisposable.DisposeAsync();
+        else if (prevViewModel is IDisposable disposable)
+            disposable.Dispose();
     }
 }

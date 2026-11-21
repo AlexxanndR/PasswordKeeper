@@ -9,9 +9,7 @@ public record Result
 
     public string Message { get; protected init; } = string.Empty;
 
-    public static Result Success(string message)
-        => new() { IsSuccess = true, Message = message };
+    public static Result Success(string message) => new() { IsSuccess = true, Message = message };
 
-    public static Result Failure(string message)
-        => new() { Message = message };
+    public static Result Failure(string message) => new() { Message = message };
 }
