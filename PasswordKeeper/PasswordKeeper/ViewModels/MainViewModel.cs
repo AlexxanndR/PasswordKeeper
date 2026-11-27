@@ -8,7 +8,7 @@ namespace PasswordKeeper.ViewModels;
 
 public partial class MainViewModel : ViewModelBase
 {
-    private INavigator _navigator;
+    private readonly INavigator _navigator;
 
     [ObservableProperty]
     private object? _currentPage;
