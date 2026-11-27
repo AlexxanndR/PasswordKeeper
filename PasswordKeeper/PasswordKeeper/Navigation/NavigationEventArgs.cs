@@ -7,6 +7,7 @@ public enum NavigationMode
     NEW,
     BACK,
     FORWARD,
+    REPLACE,
 }
 
 public class NavigationEventArgs(object? oldViewModel, object? newViewModel, NavigationMode mode)

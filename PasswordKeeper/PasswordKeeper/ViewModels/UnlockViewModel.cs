@@ -53,7 +53,7 @@ public partial class UnlockViewModel(
             }
 
             passwordsContainer.Load(await passwordsRepository.LoadAllAsync());
-            navigator.NavigateReplacing<PasswordsListViewModel>();
+            await navigator.NavigateReplacing<PasswordsListViewModel>();
         }
         finally
         {
