@@ -25,6 +25,11 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
     private readonly Dictionary<string, string> _manualErrors = [];
     private readonly HashSet<string> _touched = [];
 
+    // Last full-object validation, shared between RefreshErrors and IsValid so a
+    // keystroke doesn't run the validator twice (once per PropertyChanged, once
+    // per CanExecute poll)
+    private FluentValidation.Results.ValidationResult? _validation;
+
     protected ValidatableViewModelBase(IValidator<T> validator)
     {
         _validator = validator;
@@ -33,8 +38,9 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
 
     /// <summary>
     /// Runs the validator without surfacing errors — for CanExecute checks.
+    /// Reuses the cached result when nothing changed since the last run.
     /// </summary>
-    protected bool IsValid => _validator.Validate((T)this).IsValid;
+    protected bool IsValid => (_validation ??= _validator.Validate((T)this)).IsValid;
 
     /// <summary>
     /// Attaches an operation result to the field it belongs to (e.g. wrong master password).
@@ -59,6 +65,8 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
 
     private void OnAnyPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        _validation = null;
+
         if (e.PropertyName is not { } name || name == nameof(HasErrors))
             return;
 
@@ -72,8 +80,8 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
     {
         // Whole-object validation keeps cross-field rules (e.g. password match) in sync
         // no matter which side of the pair changed
-        var failures = _validator
-            .Validate((T)this)
+        var validation = _validation = _validator.Validate((T)this);
+        var failures = validation
             .Errors.Where(failure => _touched.Contains(failure.PropertyName))
             .GroupBy(failure => failure.PropertyName)
             .ToDictionary(
