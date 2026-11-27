@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentValidation;
@@ -62,10 +61,7 @@ public partial class PasswordManagerViewModel(
         var result = await iconImporter.ImportAsync();
 
         if (result is not null)
-            notificationService.Show(
-                result.Message,
-                result.IsSuccess ? NotificationType.Success : NotificationType.Error
-            );
+            notificationService.Show(result);
 
         if (result is { IsSuccess: true, Icon: { } icon })
         {
@@ -98,7 +94,7 @@ public partial class PasswordManagerViewModel(
         var result = await passwordsRepository.AddAsync(password);
         if (!result.IsSuccess)
         {
-            notificationService.Show(result.Message, NotificationType.Error);
+            notificationService.Show(result);
             return;
         }
 
@@ -119,7 +115,7 @@ public partial class PasswordManagerViewModel(
         var result = await passwordsRepository.UpdateAsync(password);
         if (!result.IsSuccess)
         {
-            notificationService.Show(result.Message, NotificationType.Error);
+            notificationService.Show(result);
             return;
         }
 
