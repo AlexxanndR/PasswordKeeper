@@ -38,9 +38,9 @@ public partial class PasswordManagerViewModel(
     private bool _isIconPickerOpen;
 
     [ObservableProperty]
-    private string? _selectedIcon = string.IsNullOrEmpty(password?.Platform.Icon)
-        ? IconProvider.DefaultIcon
-        : password.Platform.Icon;
+    private string? _selectedIcon = password?.Platform.Icon is { Length: > 0 } icon
+        ? icon
+        : IconProvider.DefaultIcon;
 
     public ObservableCollection<string> AvailableIcons { get; } =
     [.. IconProvider.Icons, .. iconStore.Icons];
