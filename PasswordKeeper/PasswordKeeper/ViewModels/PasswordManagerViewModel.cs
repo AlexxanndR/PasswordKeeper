@@ -128,5 +128,5 @@ public partial class PasswordManagerViewModel(
     }
 
     [RelayCommand]
-    private void Close() => navigator.GoBackward();
+    private async Task Close() => await navigator.GoBackward();
 }
