@@ -18,6 +18,8 @@ namespace PasswordKeeper.ViewModels;
 public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataErrorInfo
     where T : ValidatableViewModelBase<T>
 {
+    private static readonly ValidationResult[] NoErrors = [];
+
     private readonly IValidator<T> _validator;
     private readonly Dictionary<string, ValidationResult[]> _errors = [];
     private readonly Dictionary<string, string> _manualErrors = [];
@@ -53,7 +55,7 @@ public abstract class ValidatableViewModelBase<T> : ViewModelBase, INotifyDataEr
     public event EventHandler<DataErrorsChangedEventArgs>? ErrorsChanged;
 
     public IEnumerable GetErrors(string? propertyName) =>
-        propertyName is { } name && _errors.TryGetValue(name, out var errors) ? errors : [];
+        propertyName is { } name && _errors.TryGetValue(name, out var errors) ? errors : NoErrors;
 
     private void OnAnyPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
