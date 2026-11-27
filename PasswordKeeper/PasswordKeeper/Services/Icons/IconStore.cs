@@ -124,11 +124,13 @@ public class IconStore
         var name = Path.GetFileNameWithoutExtension(path);
         var extension = Path.GetExtension(path);
 
-        for (var i = 1; ; i++)
+        for (var i = 1; i <= 1000; i++)
         {
             var candidate = Path.Combine(directory, $"{name} ({i}){extension}");
             if (!File.Exists(candidate))
                 return candidate;
         }
+
+        return Path.Combine(directory, $"{name} ({Guid.NewGuid():N}){extension}");
     }
 }
