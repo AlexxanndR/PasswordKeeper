@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using PasswordKeeper.Results;
 
@@ -44,7 +47,11 @@ public class IconStore
                 .ToList()
             : [];
 
-    public IconImportResult Import(Stream stream, string fileName)
+    public async Task<IconImportResult> ImportAsync(
+        Stream stream,
+        string fileName,
+        CancellationToken cancellationToken = default
+    )
     {
         var extension = Path.GetExtension(fileName);
         if (!AllowedExtensions.Contains(extension, StringComparer.OrdinalIgnoreCase))
@@ -57,12 +64,25 @@ public class IconStore
             return IconImportResult.Failure(TooLargeMessage(stream.Length));
 
         using var data = new MemoryStream();
-        stream.CopyTo(data);
+        var buffer = ArrayPool<byte>.Shared.Rent(81920);
+        try
+        {
+            int read;
+            while ((read = await stream.ReadAsync(buffer, cancellationToken)) > 0)
+            {
+                if (data.Length + read > MaxFileSizeBytes)
+                    return IconImportResult.Failure(TooLargeMessage(data.Length + read));
+
+                data.Write(buffer, 0, read);
+            }
+        }
+        finally
+        {
+            ArrayPool<byte>.Shared.Return(buffer);
+        }
 
         if (data.Length == 0)
             return IconImportResult.Failure("File is empty");
-        if (data.Length > MaxFileSizeBytes)
-            return IconImportResult.Failure(TooLargeMessage(data.Length));
 
         data.Position = 0;
         Bitmap bitmap;
@@ -94,8 +114,8 @@ public class IconStore
         );
 
         data.Position = 0;
-        using var output = File.Create(targetPath);
-        data.CopyTo(output);
+        await using var output = File.Create(targetPath);
+        await data.CopyToAsync(output, cancellationToken);
 
         return IconImportResult.Success(
             targetPath,
