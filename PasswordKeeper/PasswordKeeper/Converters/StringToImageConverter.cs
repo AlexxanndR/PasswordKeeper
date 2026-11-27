@@ -10,6 +10,8 @@ namespace PasswordKeeper.Converters;
 
 public class StringToImageConverter : IValueConverter
 {
+    private const int MAX_CACHE_ENTRIES = 256;
+
     private static readonly ConcurrentDictionary<string, Bitmap> _bitmaps = new();
 
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
@@ -23,6 +25,9 @@ public class StringToImageConverter : IValueConverter
                 path,
                 static p =>
                 {
+                    if (_bitmaps.Count >= MAX_CACHE_ENTRIES)
+                        _bitmaps.Clear();
+
                     using var stream = p.StartsWith("avares:", StringComparison.OrdinalIgnoreCase)
                         ? AssetLoader.Open(new Uri(p))
                         : File.OpenRead(p);

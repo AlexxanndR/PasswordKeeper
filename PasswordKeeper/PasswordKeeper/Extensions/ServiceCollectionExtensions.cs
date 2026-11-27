@@ -9,7 +9,7 @@ using PasswordKeeper.Services.Passwords;
 using PasswordKeeper.Validation;
 using PasswordKeeper.ViewModels;
 
-namespace Mvvm.Navigation;
+namespace PasswordKeeper.Extensions;
 
 public static partial class ServiceCollectionExtensions
 {

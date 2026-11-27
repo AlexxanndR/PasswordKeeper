@@ -7,50 +7,33 @@ namespace PasswordKeeper.Navigation;
 
 public class Navigator(IServiceProvider serviceProvider) : INavigator
 {
-    private readonly IServiceProvider _serviceProvider = serviceProvider;
-
     private readonly Stack<object> _history = new();
 
     private object? _currentViewModel;
-    public object? CurrentViewModel
-    {
-        get => _currentViewModel;
-        private set
-        {
-            if (_currentViewModel == value)
-                return;
-
-            var prevViewModel = _currentViewModel;
-            _currentViewModel = value;
-
-            NavigationChanged?.Invoke(this, new(prevViewModel, value, NavigationMode.NEW));
-        }
-    }
+    public object? CurrentViewModel => _currentViewModel;
 
     public bool CanBackward => _history.Count > 0;
 
     public event EventHandler<NavigationEventArgs>? NavigationChanged;
 
     public void NavigateTo<TViewModel>()
-        where TViewModel : class => Navigate(_serviceProvider.GetRequiredService<TViewModel>());
+        where TViewModel : class => Navigate(serviceProvider.GetRequiredService<TViewModel>());
 
     public void NavigateTo<TViewModel, TParam>(params TParam[] parameters)
         where TViewModel : class
-        where TParam : class
-    {
-        var viewModel = ActivatorUtilities.CreateInstance<TViewModel>(_serviceProvider, parameters);
-        Navigate(viewModel);
-    }
+        where TParam : class =>
+        Navigate(ActivatorUtilities.CreateInstance<TViewModel>(serviceProvider, parameters));
 
-    public void NavigateReplacing<TViewModel>()
-        where TViewModel : class =>
-        CurrentViewModel = _serviceProvider.GetRequiredService<TViewModel>();
-
-    private void Navigate(object viewModel)
+    public async Task NavigateReplacing<TViewModel>()
+        where TViewModel : class
     {
-        if (_currentViewModel != null)
-            _history.Push(_currentViewModel);
-        CurrentViewModel = viewModel;
+        var viewModel = serviceProvider.GetRequiredService<TViewModel>();
+        if (ReferenceEquals(_currentViewModel, viewModel))
+            return;
+
+        var replaced = _currentViewModel;
+        SetCurrent(viewModel, NavigationMode.REPLACE);
+        await DisposeViewModelAsync(replaced);
     }
 
     public async Task GoBackward()
@@ -58,13 +41,38 @@ public class Navigator(IServiceProvider serviceProvider) : INavigator
         if (!CanBackward)
             return;
 
-        var prevViewModel = _currentViewModel;
-        _currentViewModel = _history.Pop();
-        NavigationChanged?.Invoke(this, new(prevViewModel, _currentViewModel, NavigationMode.BACK));
+        var leaving = _currentViewModel;
+        SetCurrent(_history.Pop(), NavigationMode.BACK);
+        await DisposeViewModelAsync(leaving);
+    }
 
-        if (prevViewModel is IAsyncDisposable asyncDisposable)
+    private void Navigate(object viewModel)
+    {
+        if (ReferenceEquals(_currentViewModel, viewModel))
+            return;
+
+        if (_currentViewModel is { } previous)
+            _history.Push(previous);
+
+        SetCurrent(viewModel, NavigationMode.NEW);
+    }
+
+    private void SetCurrent(object? viewModel, NavigationMode mode)
+    {
+        if (ReferenceEquals(_currentViewModel, viewModel))
+            return;
+
+        var previous = _currentViewModel;
+        _currentViewModel = viewModel;
+
+        NavigationChanged?.Invoke(this, new(previous, viewModel, mode));
+    }
+
+    private static async Task DisposeViewModelAsync(object? viewModel)
+    {
+        if (viewModel is IAsyncDisposable asyncDisposable)
             await asyncDisposable.DisposeAsync();
-        else if (prevViewModel is IDisposable disposable)
+        else if (viewModel is IDisposable disposable)
             disposable.Dispose();
     }
 }

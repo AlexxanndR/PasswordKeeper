@@ -1,6 +1,5 @@
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using FluentValidation;
@@ -38,9 +37,9 @@ public partial class PasswordManagerViewModel(
     private bool _isIconPickerOpen;
 
     [ObservableProperty]
-    private string? _selectedIcon = string.IsNullOrEmpty(password?.Platform.Icon)
-        ? IconProvider.DefaultIcon
-        : password.Platform.Icon;
+    private string? _selectedIcon = password?.Platform.Icon is { Length: > 0 } icon
+        ? icon
+        : IconProvider.DefaultIcon;
 
     public ObservableCollection<string> AvailableIcons { get; } =
     [.. IconProvider.Icons, .. iconStore.Icons];
@@ -62,10 +61,7 @@ public partial class PasswordManagerViewModel(
         var result = await iconImporter.ImportAsync();
 
         if (result is not null)
-            notificationService.Show(
-                result.Message,
-                result.IsSuccess ? NotificationType.Success : NotificationType.Error
-            );
+            notificationService.Show(result);
 
         if (result is { IsSuccess: true, Icon: { } icon })
         {
@@ -80,53 +76,33 @@ public partial class PasswordManagerViewModel(
     [RelayCommand(CanExecute = nameof(CanSave))]
     private async Task Save()
     {
-        if (password is { } editPassword)
-            await SaveEdited(editPassword.Id);
+        var isEdit = password is not null;
+        var entry = new Password
+        {
+            Id = password?.Id ?? 0,
+            Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
+            Value = Value,
+        };
+
+        // Write to the encrypted vault first; only touch the list once saved
+        var result = isEdit
+            ? await passwordsRepository.UpdateAsync(entry)
+            : await passwordsRepository.AddAsync(entry);
+
+        if (!result.IsSuccess)
+        {
+            notificationService.Show(result);
+            return;
+        }
+
+        if (isEdit)
+            passwordsContainer.Update(entry);
         else
-            await SaveNew();
-    }
+            passwordsContainer.Add(entry);
 
-    private async Task SaveNew()
-    {
-        var password = new Password
-        {
-            Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
-            Value = Value,
-        };
-
-        // Write to the encrypted vault first; only show it in the list once saved
-        var result = await passwordsRepository.AddAsync(password);
-        if (!result.IsSuccess)
-        {
-            notificationService.Show(result.Message, NotificationType.Error);
-            return;
-        }
-
-        passwordsContainer.Add(password);
-        await navigator.GoBackward();
-    }
-
-    private async Task SaveEdited(int passwordId)
-    {
-        var password = new Password
-        {
-            Id = passwordId,
-            Platform = new PlatformInfo { Name = Name, Icon = SelectedIcon ?? string.Empty },
-            Value = Value,
-        };
-
-        // Write to the encrypted vault first; only refresh the list row once saved
-        var result = await passwordsRepository.UpdateAsync(password);
-        if (!result.IsSuccess)
-        {
-            notificationService.Show(result.Message, NotificationType.Error);
-            return;
-        }
-
-        passwordsContainer.Update(password);
         await navigator.GoBackward();
     }
 
     [RelayCommand]
-    private void Close() => navigator.GoBackward();
+    private async Task Close() => await navigator.GoBackward();
 }

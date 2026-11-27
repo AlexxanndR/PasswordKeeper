@@ -18,6 +18,6 @@ public interface INavigator
         where TViewModel : class
         where TParam : class;
 
-    void NavigateReplacing<TViewModel>()
+    Task NavigateReplacing<TViewModel>()
         where TViewModel : class;
 }

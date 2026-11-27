@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,6 +15,24 @@ namespace PasswordKeeper.Services.Passwords;
 /// </summary>
 public class PasswordsRepository(IDbContextFactory<VaultContext> contextFactory)
 {
+    private static readonly VaultOperation Add = new(
+        static (context, entry) => context.Passwords.Add(entry),
+        static password => $"Saved \"{password.Platform.Name}\"",
+        static ex => $"Could not save the password: {ex.Message}"
+    );
+
+    private static readonly VaultOperation Update = new(
+        static (context, entry) => context.Passwords.Update(entry),
+        static password => $"Updated \"{password.Platform.Name}\"",
+        static ex => $"Could not update the password: {ex.Message}"
+    );
+
+    private static readonly VaultOperation Remove = new(
+        static (context, entry) => context.Passwords.Remove(entry),
+        static password => $"Removed \"{password.Platform.Name}\"",
+        static ex => $"Could not remove the password: {ex.Message}"
+    );
+
     public async Task<IReadOnlyList<Password>> LoadAllAsync(
         CancellationToken cancellationToken = default
     )
@@ -22,57 +41,47 @@ public class PasswordsRepository(IDbContextFactory<VaultContext> contextFactory)
         return await context.Passwords.AsNoTracking().ToListAsync(cancellationToken);
     }
 
-    public async Task<Result> AddAsync(
+    public Task<Result> AddAsync(
         Password password,
         CancellationToken cancellationToken = default
+    ) => ExecuteAsync(password, Add, cancellationToken);
+
+    public Task<Result> UpdateAsync(
+        Password password,
+        CancellationToken cancellationToken = default
+    ) => ExecuteAsync(password, Update, cancellationToken);
+
+    public Task<Result> RemoveAsync(
+        Password password,
+        CancellationToken cancellationToken = default
+    ) => ExecuteAsync(password, Remove, cancellationToken);
+
+    private async Task<Result> ExecuteAsync(
+        Password password,
+        VaultOperation operation,
+        CancellationToken cancellationToken
     )
     {
         try
         {
             await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-            context.Passwords.Add(password);
+            operation.Apply(context, password);
             await context.SaveChangesAsync(cancellationToken);
 
-            return Result.Success($"Saved \"{password.Platform.Name}\"");
+            return Result.Success(operation.SuccessMessage(password));
         }
-        catch (SqliteException ex)
+        catch (Exception ex) when (ex is SqliteException or DbUpdateException)
         {
-            return Result.Failure($"Could not save the password: {ex.Message}");
+            return Result.Failure(operation.FailureMessage(ex));
         }
     }
 
-    public async Task<Result> UpdateAsync(
-        Password password,
-        CancellationToken cancellationToken = default
-    )
-    {
-        try
-        {
-            await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-            context.Passwords.Update(password);
-            await context.SaveChangesAsync(cancellationToken);
-
-            return Result.Success($"Updated \"{password.Platform.Name}\"");
-        }
-        catch (SqliteException ex)
-        {
-            return Result.Failure($"Could not update the password: {ex.Message}");
-        }
-    }
-
-    public async Task<Result> RemoveAsync(Password password, CancellationToken cancellationToken = default)
-    {
-        try
-        {
-            await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
-            context.Passwords.Remove(password);
-            await context.SaveChangesAsync(cancellationToken);
-
-            return Result.Success($"Removed \"{password.Platform.Name}\"");
-        }
-        catch (SqliteException ex)
-        {
-            return Result.Failure($"Could not remove the password: {ex.Message}");
-        }
-    }
+    /// <summary>
+    /// A single vault operation: how to apply it and the messages describing its outcome
+    /// </summary>
+    private sealed record VaultOperation(
+        Action<VaultContext, Password> Apply,
+        Func<Password, string> SuccessMessage,
+        Func<Exception, string> FailureMessage
+    );
 }

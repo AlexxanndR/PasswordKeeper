@@ -49,6 +49,8 @@ public class VaultManager
             };
             _connectionString = builder.ToString();
 
+            CryptographicOperations.ZeroMemory(key);
+
             await using var probe = new VaultContext(
                 new DbContextOptionsBuilder<VaultContext>()
                     .UseSqlite(_connectionString)

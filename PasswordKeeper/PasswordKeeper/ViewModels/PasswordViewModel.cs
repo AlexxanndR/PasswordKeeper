@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Avalonia.Controls.Notifications;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using PasswordKeeper.Models.Password;
@@ -38,13 +37,9 @@ public partial class PasswordViewModel(
     private async Task Remove()
     {
         var result = await passwordsRepository.RemoveAsync(Password);
-        if (!result.IsSuccess)
-        {
-            notificationService.Show(result.Message, NotificationType.Error);
-            return;
-        }
+        if (result.IsSuccess)
+            passwordsContainer.Remove(Password);
 
-        passwordsContainer.Remove(Password);
-        notificationService.Show(result.Message, NotificationType.Success);
+        notificationService.Show(result);
     }
 }

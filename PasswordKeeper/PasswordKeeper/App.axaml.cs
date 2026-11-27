@@ -5,7 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.DependencyInjection;
-using Mvvm.Navigation;
+using PasswordKeeper.Extensions;
 using PasswordKeeper.Services.Notifications;
 using PasswordKeeper.ViewModels;
 using PasswordKeeper.Views;

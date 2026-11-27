@@ -34,7 +34,8 @@ public class IconImporter(IconStore iconStore)
             return null;
 
         await using var stream = await files[0].OpenReadAsync();
-        return iconStore.Import(stream, files[0].Name);
+
+        return await Task.Run(() => iconStore.ImportAsync(stream, files[0].Name));
     }
 
     private static IStorageProvider? GetStorageProvider() =>
