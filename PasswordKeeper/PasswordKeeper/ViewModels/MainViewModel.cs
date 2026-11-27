@@ -14,7 +14,7 @@ public partial class MainViewModel : ViewModelBase
     private object? _currentPage;
 
     [ObservableProperty]
-    private bool? _isDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+    private bool _isDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
 
     public MainViewModel(INavigator navigator)
     {
@@ -29,9 +29,8 @@ public partial class MainViewModel : ViewModelBase
     [RelayCommand]
     private void ToggleTheme()
     {
-        IsDarkTheme = IsDarkTheme.HasValue && !IsDarkTheme.Value;
+        IsDarkTheme = !IsDarkTheme;
         if (Application.Current is { } app)
-            Application.Current.RequestedThemeVariant =
-                IsDarkTheme.HasValue && IsDarkTheme.Value ? ThemeVariant.Dark : ThemeVariant.Light;
+            app.RequestedThemeVariant = IsDarkTheme ? ThemeVariant.Dark : ThemeVariant.Light;
     }
 }
